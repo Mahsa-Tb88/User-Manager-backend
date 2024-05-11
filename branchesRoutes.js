@@ -114,7 +114,6 @@ router.put("/:id", async (req, res) => {
         },
         { new: true }
       );
-      updateBranch.save();
       res.status(201).json({
         success: true,
         body: updateBranch,

@@ -30,7 +30,6 @@ router.get("/:id", async (req, res) => {
     });
   }
 });
-
 router.post("/", async (req, res) => {
   const firstname = req.body.firstname;
   const lastname = req.body.lastname;
@@ -40,9 +39,8 @@ router.post("/", async (req, res) => {
   const avatarURL = req.body.avatarURL;
   const description = req.body.description;
   const branch = req.body.branch;
-
   if (
-    req.body.firstname &&
+    firstname &&
     lastname &&
     phone &&
     email &&
@@ -50,23 +48,32 @@ router.post("/", async (req, res) => {
     avatarURL &&
     branch
   ) {
-    const newUser = new User({
-      firstname,
-      lastname,
-      phone,
-      email,
-      province,
-      avatarURL,
-      description,
-      branch,
-    });
-    newUser.save();
-    res.json({
-      success: true,
-      body: newUser,
-      message: "New User Created Successfully!",
-      code: 200,
-    });
+    try {
+      const newUser = new User({
+        firstname,
+        lastname,
+        phone,
+        email,
+        province,
+        avatarURL,
+        description,
+        branch,
+      });
+      await newUser.save();
+      res.json({
+        success: true,
+        body: newUser,
+        message: "New User Created Successfully!",
+        code: 200,
+      });
+    } catch (e) {
+      res.json({
+        success: false,
+        body: null,
+        message: e.message,
+        code: 500,
+      });
+    }
   } else {
     res.status(401).json({
       success: false,
@@ -76,15 +83,77 @@ router.post("/", async (req, res) => {
     });
   }
 });
-
 router.put("/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    if(user){
-        const updateUser=new User({})
-    }else{}
-  } catch (e) {}
+    if (user) {
+      const firstname = req.body.firstname ?? user.firstname;
+      const lastname = req.body.lastname ?? user.lastname;
+      const phone = req.body.phone ?? user.phone;
+      const email = req.body.email ?? user.email;
+      const province = req.body.province ?? user.province;
+      const description = req.body.description ?? user.description;
+      const branch = req.body.branch ?? user.branch;
+      const newUser = {
+        firstname,
+        lastname,
+        phone,
+        email,
+        province,
+        description,
+        branch,
+      };
+      const updateUser = await User.findByIdAndUpdate(req.params.id, newUser);
+      res.status(201).json({
+        success: true,
+        body: updateUser,
+        message: "user was updated successfully!",
+        code: 201,
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        body: null,
+        message: "Please fill out all fields!",
+        code: 400,
+      });
+    }
+  } catch (e) {
+    res.status(500).json({
+      success: false,
+      body: null,
+      message: e.message,
+      code: 500,
+    });
+  }
 });
-router.delete("/:id", async (req, res) => {});
+router.delete("/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (user) {
+      const user = await User.findByIdAndDelete(req.params.id);
+      res.json({
+        success: true,
+        body: null,
+        message: "user was deleted successfully!",
+        code: 200,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        body: null,
+        message: "user was founded !",
+        code: 404,
+      });
+    }
+  } catch (e) {
+    res.status(500).json({
+      success: false,
+      body: null,
+      message: e.message,
+      code: 500,
+    });
+  }
+});
 
 export default router;

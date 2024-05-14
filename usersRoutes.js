@@ -1,8 +1,30 @@
 import express from "express";
 import User from "./userSchema.js";
+import Branch from "./branchSchema.js";
 
 const router = express.Router();
 
+// router.get("/", async (req, res) => {
+//   const search = req.query.search ?? "";
+//   const query = { firstname: RegExp(search, "i") };
+
+//   try {
+//     const users = await User.find(query);
+//     res.json({
+//       success: true,
+//       body: users,
+//       message: "Users fetch successfully!",
+//       code: 200,
+//     });
+//   } catch (e) {
+//     res.status(500).json({
+//       success: false,
+//       body: null,
+//       message: e.message,
+//       code: 500,
+//     });
+//   }
+// });
 router.get("/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -17,7 +39,7 @@ router.get("/:id", async (req, res) => {
       res.status(404).json({
         success: false,
         body: null,
-        message: "User not founded!",
+        message: "User was not founded!",
         code: 404,
       });
     }

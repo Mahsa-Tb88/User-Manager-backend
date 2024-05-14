@@ -6,10 +6,6 @@ const branchSchema = new mongoose.Schema({
     unique: true,
     required: true,
   },
-  usersBranch: {
-    type: [String],
-    default: [],
-  },
 });
 
 const Branch = mongoose.model("Branch", branchSchema);

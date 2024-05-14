@@ -1,11 +1,14 @@
 import express from "express";
 import Branch from "./branchSchema.js";
+import User from "./userSchema.js";
 
 const router = express.Router();
 
 router.get("/", async (req, res) => {
+  const search = req.query.branch ?? "";
+  const query = { branchName: RegExp(search, "i") };
   try {
-    const branches = await Branch.find();
+    const branches = await Branch.find(query);
     res.json({
       success: true,
       body: branches,
@@ -21,14 +24,22 @@ router.get("/", async (req, res) => {
     });
   }
 });
-
 router.get("/:branchName", async (req, res) => {
+  const userSearch = req.body.user ?? "";
   try {
     const branch = await Branch.findOne({ branchName: req.params.branchName });
     if (branch) {
+      const query = {
+        $or: [
+          { firstname: RegExp(userSearch, "i") },
+          { lastname: RegExp(userSearch, "i") },
+        ],
+      };
+      query.branch = req.params.branchName;
+      const searchUserInBranch = await User.find(query);
       res.json({
         success: true,
-        body: branch,
+        body: searchUserInBranch,
         message: "branch fetch successfully!",
         code: 200,
       });
@@ -49,7 +60,6 @@ router.get("/:branchName", async (req, res) => {
     });
   }
 });
-
 router.post("/", async (req, res) => {
   if (req.body.branchName) {
     try {
@@ -59,26 +69,17 @@ router.post("/", async (req, res) => {
       if (!findBranch) {
         const newBranch = new Branch({
           branchName: req.body.branchName,
-          usersBranch: [],
         });
-        try {
-          await newBranch.save();
-          res.status(201).json({
-            success: true,
-            body: newBranch,
-            message: "new Branch created Successfully!",
-            code: 201,
-          });
-        } catch (e) {
-          res.status(500).json({
-            success: false,
-            body: null,
-            message: e.message,
-            code: 500,
-          });
-        }
+
+        await newBranch.save();
+        res.status(201).json({
+          success: true,
+          body: newBranch,
+          message: "new Branch created Successfully!",
+          code: 201,
+        });
       } else {
-        res.status(401).json({
+        return res.status(401).json({
           success: false,
           body: null,
           message: "This BranchName is already exist!",
@@ -110,10 +111,17 @@ router.put("/:id", async (req, res) => {
         req.params.id,
         {
           branchName: req.body.branchName ?? branch.branchName,
-          usersBranch: req.body.usersBranch ?? branch.usersBranch,
         },
         { new: true }
       );
+
+      const updateBranchNameOfUsers = await User.updateMany(
+        {
+          branch: branch.branchName,
+        },
+        { branch: req.body.branchName ?? branch.branchName }
+      );
+
       res.status(201).json({
         success: true,
         body: updateBranch,
@@ -137,12 +145,22 @@ router.put("/:id", async (req, res) => {
     });
   }
 });
-
 router.delete("/:id", async (req, res) => {
   try {
     const findBranch = await Branch.findById(req.params.id);
     if (findBranch) {
-      await Branch.findByIdAndDelete(req.params.id);
+      const usersOfBranch = await User.findOne({
+        branch: findBranch.branchName,
+      });
+      if (usersOfBranch) {
+        return res.status(401).json({
+          success: true,
+          body: null,
+          message: "We can not delete this branch becuse of some users in it!",
+        });
+      }
+      const branches = await Branch.findByIdAndDelete(req.params.id);
+      console.log(branches);
       res.status(200).json({
         success: true,
         body: null,

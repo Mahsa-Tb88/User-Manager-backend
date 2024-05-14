@@ -29,6 +29,7 @@ const userSchema = new mongoose.Schema({
   },
   description: {
     type: String,
+    default: "write something...",
   },
   branch: {
     type: String,

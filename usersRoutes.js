@@ -53,23 +53,16 @@ router.get("/:id", async (req, res) => {
   }
 });
 router.post("/", async (req, res) => {
+  console.log(req.body);
   const firstname = req.body.firstname;
   const lastname = req.body.lastname;
   const phone = req.body.phone;
   const email = req.body.email;
   const province = req.body.province;
-  const avatarURL = req.body.avatarURL;
+
   const description = req.body.description;
   const branch = req.body.branch;
-  if (
-    firstname &&
-    lastname &&
-    phone &&
-    email &&
-    province &&
-    avatarURL &&
-    branch
-  ) {
+  if (firstname && lastname && phone && email && province && branch) {
     try {
       const newUser = new User({
         firstname,
@@ -77,7 +70,7 @@ router.post("/", async (req, res) => {
         phone,
         email,
         province,
-        avatarURL,
+
         description,
         branch,
       });
@@ -106,6 +99,7 @@ router.post("/", async (req, res) => {
   }
 });
 router.put("/:id", async (req, res) => {
+  console.log(req.body);
   try {
     const user = await User.findById(req.params.id);
     if (user) {

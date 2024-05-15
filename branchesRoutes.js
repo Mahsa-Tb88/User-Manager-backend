@@ -25,7 +25,7 @@ router.get("/", async (req, res) => {
   }
 });
 router.get("/:branchName", async (req, res) => {
-  const userSearch = req.body.user ?? "";
+  const userSearch = req.query.user ?? "";
   try {
     const branch = await Branch.findOne({ branchName: req.params.branchName });
     if (branch) {
@@ -154,9 +154,10 @@ router.delete("/:id", async (req, res) => {
       });
       if (usersOfBranch) {
         return res.status(401).json({
-          success: true,
+          success: false,
           body: null,
-          message: "We can not delete this branch becuse of some users in it!",
+          message: "We can not delete this branch because of some users in it!",
+          code: 401,
         });
       }
       const branches = await Branch.findByIdAndDelete(req.params.id);

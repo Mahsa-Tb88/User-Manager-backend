@@ -14,6 +14,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  image: {
+    type: String,
+    default: "",
+  },
   email: {
     type: String,
     required: true,
@@ -25,7 +29,7 @@ const userSchema = new mongoose.Schema({
   },
   description: {
     type: String,
-    default: "write something...",
+    default: "",
   },
   branch: {
     type: String,

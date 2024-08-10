@@ -161,7 +161,6 @@ router.delete("/:id", async (req, res) => {
         });
       }
       const branches = await Branch.findByIdAndDelete(req.params.id);
-      console.log(branches);
       res.status(200).json({
         success: true,
         body: null,

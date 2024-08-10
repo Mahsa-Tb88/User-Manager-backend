@@ -4,27 +4,6 @@ import Branch from "./branchSchema.js";
 
 const router = express.Router();
 
-// router.get("/", async (req, res) => {
-//   const search = req.query.search ?? "";
-//   const query = { firstname: RegExp(search, "i") };
-
-//   try {
-//     const users = await User.find(query);
-//     res.json({
-//       success: true,
-//       body: users,
-//       message: "Users fetch successfully!",
-//       code: 200,
-//     });
-//   } catch (e) {
-//     res.status(500).json({
-//       success: false,
-//       body: null,
-//       message: e.message,
-//       code: 500,
-//     });
-//   }
-// });
 router.get("/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -53,43 +32,16 @@ router.get("/:id", async (req, res) => {
   }
 });
 router.post("/", async (req, res) => {
-  console.log(req.body);
   const firstname = req.body.firstname;
   const lastname = req.body.lastname;
   const phone = req.body.phone;
+  const image = req.body.image;
   const email = req.body.email;
   const province = req.body.province;
-
   const description = req.body.description;
   const branch = req.body.branch;
-  if (firstname && lastname && phone && email && province && branch) {
-    try {
-      const newUser = new User({
-        firstname,
-        lastname,
-        phone,
-        email,
-        province,
-
-        description,
-        branch,
-      });
-      await newUser.save();
-      res.json({
-        success: true,
-        body: newUser,
-        message: "New User Created Successfully!",
-        code: 200,
-      });
-    } catch (e) {
-      res.json({
-        success: false,
-        body: null,
-        message: e.message,
-        code: 500,
-      });
-    }
-  } else {
+  console.log(req.body);
+  if (!firstname && !lastname && !phone && !email && !province && !branch) {
     res.status(401).json({
       success: false,
       body: null,
@@ -97,9 +49,34 @@ router.post("/", async (req, res) => {
       code: 401,
     });
   }
+  try {
+    const newUser = new User({
+      firstname,
+      lastname,
+      phone,
+      email,
+      province,
+      image,
+      description,
+      branch,
+    });
+    await newUser.save();
+    res.json({
+      success: true,
+      body: newUser,
+      message: "New User Created Successfully!",
+      code: 200,
+    });
+  } catch (e) {
+    res.json({
+      success: false,
+      body: null,
+      message: e.message,
+      code: 500,
+    });
+  }
 });
 router.put("/:id", async (req, res) => {
-  console.log(req.body);
   try {
     const user = await User.findById(req.params.id);
     if (user) {
@@ -107,6 +84,7 @@ router.put("/:id", async (req, res) => {
       const lastname = req.body.lastname ?? user.lastname;
       const phone = req.body.phone ?? user.phone;
       const email = req.body.email ?? user.email;
+      const image = req.body.image ?? user.image;
       const province = req.body.province ?? user.province;
       const description = req.body.description ?? user.description;
       const branch = req.body.branch ?? user.branch;
@@ -115,6 +93,7 @@ router.put("/:id", async (req, res) => {
         lastname,
         phone,
         email,
+        image,
         province,
         description,
         branch,

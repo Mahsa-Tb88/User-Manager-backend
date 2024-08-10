@@ -10,10 +10,6 @@ const app = express();
 app.use(express.json());
 
 app.use((req, res, next) => {
-  console.clear();
-  next();
-});
-app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Headers", "*");
   res.setHeader("Access-Control-Allow-Methods", "*");
@@ -44,7 +40,7 @@ const storage = multer.diskStorage({
 
 const uploder = multer({ storage, limits: { fileSize: 800000 } });
 
-app.post("/uploads", uploder.single("my-file"), (req, res) => {
+app.post("/uploads", uploder.single("file"), (req, res) => {
   res.json(req.file);
 });
 app.use((err, req, res, next) => {

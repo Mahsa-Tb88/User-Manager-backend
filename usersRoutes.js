@@ -40,7 +40,6 @@ router.post("/", async (req, res) => {
   const province = req.body.province;
   const description = req.body.description;
   const branch = req.body.branch;
-  console.log(req.body);
   if (!firstname && !lastname && !phone && !email && !province && !branch) {
     res.status(401).json({
       success: false,
